@@ -56,7 +56,9 @@ jobs:
       - name: Trivy config scan
         run: |
           set -euo pipefail
-          trivy config --severity CRITICAL,HIGH --exit-code 1 --ignorefile .trivyignore .
+          trivy config --severity CRITICAL,HIGH --exit-code 1 \
+            --skip-version-check \
+            --ignorefile .trivyignore .
 
       - name: Checkov
         # bridgecrewio/checkov-action@v12.999.0

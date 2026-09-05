@@ -18,7 +18,7 @@ run() {
 }
 
 run "tflint" tflint --recursive --config "$ROOT_DIR/.tflint.hcl"
-run "trivy" trivy config --severity CRITICAL,HIGH --exit-code 1 .
+run "trivy" trivy config --severity CRITICAL,HIGH --exit-code 1 --skip-version-check --ignorefile "$ROOT_DIR/.trivyignore" .
 run "checkov" checkov -d . --config-file "$ROOT_DIR/.checkov.yml"
 run "conftest" conftest test tests/unit/fixtures/pass/ --policy policies/conftest/
 run "opa" opa test policies/opa/ -v

@@ -5,9 +5,10 @@ locals {
 resource "aws_lb" "this" {
   name               = "${var.name_prefix}-alb"
   load_balancer_type = "application"
-  internal           = false
-  security_groups    = [var.security_group_id]
-  subnets            = var.public_subnet_ids
+  # Public edge by design — only application ingress path from the internet.
+  internal        = false
+  security_groups = [var.security_group_id]
+  subnets         = var.public_subnet_ids
 
   idle_timeout               = var.idle_timeout
   enable_deletion_protection = false

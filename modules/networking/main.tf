@@ -8,6 +8,15 @@ resource "aws_vpc" "this" {
   })
 }
 
+# Lock down the AWS default SG (Checkov CKV2_AWS_12) — unused; real rules are on named SGs.
+resource "aws_default_security_group" "this" {
+  vpc_id = aws_vpc.this.id
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-default-sg-locked"
+  })
+}
+
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 

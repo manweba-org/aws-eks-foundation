@@ -45,6 +45,8 @@ resource "aws_db_instance" "this" {
   manage_master_user_password   = true
   master_user_secret_kms_key_id = var.secrets_kms_key_arn
 
+  iam_database_authentication_enabled = true
+
   db_subnet_group_name      = aws_db_subnet_group.this.name
   vpc_security_group_ids    = [var.database_security_group_id]
   parameter_group_name      = aws_db_parameter_group.postgres15.name
@@ -62,9 +64,37 @@ resource "aws_db_instance" "this" {
   auto_minor_version_upgrade = true
   apply_immediately          = false
 
+  monitoring_interval = 60
+  monitoring_role_arn = aws_iam_role.rds_monitoring.arn
+
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 
   tags = merge(var.tags, {
     Name = "${var.name_prefix}-postgres"
   })
+
+  depends_on = [aws_iam_role_policy_attachment.rds_monitoring]
+}
+
+data "aws_iam_policy_document" "rds_monitoring_assume" {
+  statement {
+    sid     = "RDSMonitoringAssume"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["monitoring.rds.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "rds_monitoring" {
+  name               = "${var.name_prefix}-rds-monitoring"
+  assume_role_policy = data.aws_iam_policy_document.rds_monitoring_assume.json
+  tags               = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "rds_monitoring" {
+  role       = aws_iam_role.rds_monitoring.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }

@@ -117,14 +117,15 @@ module "alb" {
   count  = var.enable_alb ? 1 : 0
   source = "../../modules/alb"
 
-  name_prefix       = local.name_prefix
-  vpc_id            = module.networking.vpc_id
-  public_subnet_ids = module.networking.public_subnet_ids
-  security_group_id = module.security.alb_security_group_id
-  certificate_arn   = var.alb_certificate_arn
-  target_port       = var.alb_target_port
-  health_check_path = var.alb_health_check_path
-  tags              = local.common_tags
+  name_prefix                = local.name_prefix
+  vpc_id                     = module.networking.vpc_id
+  public_subnet_ids          = module.networking.public_subnet_ids
+  security_group_id          = module.security.alb_security_group_id
+  certificate_arn            = var.alb_certificate_arn
+  target_port                = var.alb_target_port
+  health_check_path          = var.alb_health_check_path
+  enable_deletion_protection = var.rds_deletion_protection
+  tags                       = local.common_tags
 }
 
 module "observability" {

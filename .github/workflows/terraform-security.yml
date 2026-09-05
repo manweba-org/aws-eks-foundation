@@ -62,7 +62,7 @@ jobs:
 
       - name: Checkov
         # bridgecrewio/checkov-action@v12.999.0
-        uses: bridgecrewio/checkov-action@8c07e78c64ddc2209d8c193a4e321aad67677f8d
+        uses: bridgecrewio/checkov-action@f967808197a8d784d3e72919f38c3ff0cda7884e
         with:
           directory: .
           framework: terraform

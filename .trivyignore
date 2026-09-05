@@ -1,0 +1,5 @@
+# Trivy ignore entries — document every exception with justification.
+# Prefer fixing findings over ignoring them.
+
+# Example (keep empty until a real justified exception exists):
+# AVD-AWS-0057  # wildcard IAM on KMS key policies is the AWS account-admin pattern

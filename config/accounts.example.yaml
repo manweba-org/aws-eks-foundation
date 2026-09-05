@@ -1,0 +1,33 @@
+# Example account map (planning notes only)
+
+> **Not consumed by Terraform or CI.** These YAML files are human planning notes for
+> optional multi-account layouts. Modules and workflows do **not** read this file.
+
+# Replace placeholders — never commit real account IDs to public forks if undesired.
+#
+# Phase 1 runs in a single account. Management / delegated-admin features
+# (org CloudTrail, org Config, Security Hub aggregation) require the
+# organizations management account or a delegated administrator.
+
+accounts:
+  management:
+    name: management
+    account_id: "REPLACE_WITH_MGMT_ACCOUNT_ID"
+    email: platform-mgmt@example.com
+  workload_dev:
+    name: workload-dev
+    account_id: "REPLACE_WITH_DEV_ACCOUNT_ID"
+    email: workload-dev@example.com
+  workload_staging:
+    name: workload-staging
+    account_id: "REPLACE_WITH_STAGING_ACCOUNT_ID"
+    email: workload-staging@example.com
+  workload_prod:
+    name: workload-prod
+    account_id: "REPLACE_WITH_PROD_ACCOUNT_ID"
+    email: workload-prod@example.com
+  audit:
+    name: audit
+    account_id: "REPLACE_WITH_AUDIT_ACCOUNT_ID"
+    email: audit@example.com
+    notes: "Optional log-archive / security tooling account"

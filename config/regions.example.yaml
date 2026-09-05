@@ -1,0 +1,20 @@
+# Example region configuration (planning notes only)
+#
+# NOT consumed by Terraform or CI. Human planning notes for primary + DR intent.
+# Phase 1 resources deploy to primary_region only (via environment tfvars).
+
+regions:
+  primary:
+    name: us-east-1
+    az_count: 3
+  dr:
+    name: us-west-2
+    az_count: 3
+    notes: "Documented for future multi-region; unused by Phase 1 resources"
+
+network:
+  # Per-environment VPC CIDRs should not overlap if peered later
+  cidrs:
+    dev: "10.0.0.0/16"
+    staging: "10.1.0.0/16"
+    prod: "10.2.0.0/16"

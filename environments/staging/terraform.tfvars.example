@@ -1,0 +1,36 @@
+project_name = "aidemo"
+environment  = "staging"
+owner        = "platform-team"
+cost_center  = "engineering-demo"
+
+primary_region = "us-east-1"
+vpc_cidr       = "10.1.0.0/16"
+az_count       = 3
+
+single_nat_gateway      = true
+rds_multi_az            = true
+rds_deletion_protection = false
+backup_retention_days   = 14
+eks_desired_size        = 2
+eks_min_size            = 2
+eks_node_instance_types = ["t3.medium"]
+rds_instance_class      = "db.t3.medium"
+
+enable_encryption   = true
+enable_flow_logs    = true
+enable_backup       = true
+enable_cloudtrail   = true
+enable_guardduty    = false
+enable_security_hub = false
+enable_config       = false
+
+enable_alb              = true
+enable_irsa             = true
+enable_addons           = true
+enable_access_entries   = true
+# cluster_admin_principal_arns = ["arn:aws:iam::123456789012:role/YourAdminRole"]
+# alb_certificate_arn        = "arn:aws:acm:us-east-1:123456789012:certificate/..."
+
+allowed_admin_cidrs = []
+
+compliance_frameworks = ["well-architected", "cis-aws"]

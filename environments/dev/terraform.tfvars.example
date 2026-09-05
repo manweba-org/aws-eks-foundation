@@ -1,0 +1,39 @@
+project_name = "aidemo"
+environment  = "dev"
+owner        = "platform-team"
+cost_center  = "engineering-demo"
+
+primary_region = "us-east-1"
+vpc_cidr       = "10.0.0.0/16"
+az_count       = 2
+
+single_nat_gateway        = true
+rds_multi_az              = false
+rds_deletion_protection   = false
+backup_retention_days     = 7
+eks_desired_size          = 2
+eks_node_instance_types   = ["t3.medium"]
+rds_instance_class        = "db.t3.medium"
+
+enable_encryption  = true
+enable_flow_logs   = true
+enable_backup      = true
+enable_cloudtrail  = true
+enable_guardduty   = false
+enable_security_hub = false
+enable_config      = false
+
+enable_alb    = true
+# alb_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/..."  # enables HTTPS + redirect
+enable_irsa   = true
+enable_addons = true
+enable_access_entries = true
+# IAM principals that can kubectl after apply (VPN/SSM path to private API):
+# cluster_admin_principal_arns = ["arn:aws:iam::123456789012:role/YourAdminRole"]
+
+# Replace with your management CIDRs — never use 0.0.0.0/0 here.
+allowed_admin_cidrs = []
+
+# Optional: alert_email = "ops@example.com"
+
+compliance_frameworks = ["well-architected", "cis-aws"]

@@ -1,0 +1,61 @@
+# Local Terraform / tool caches
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+# Keep .terraform.lock.hcl committed for reproducible plans
+
+# Variable files that may contain secrets (keep *.example)
+*.tfvars
+!*.tfvars.example
+backend.hcl
+!backend.hcl.example
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials
+credentials.json
+secrets/
+.aws/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Build / test artifacts
+bin/
+.bins/
+coverage/
+*.out
+vendor/
+node_modules/
+.pytest_cache/
+__pycache__/
+*.pyc
+.terragrunt-cache/
+.external_modules/
+
+# Generated docs scratch
+.tmp/
+.cache/
+
+# Local tooling installs (optional)
+.tfenv/
+.tflint.d/

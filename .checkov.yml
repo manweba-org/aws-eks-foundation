@@ -1,0 +1,18 @@
+# Checkov configuration — shared by CI and local scripts.
+
+framework:
+  - terraform
+
+quiet: false
+compact: true
+
+# CKV2_AWS_11 (VPC flow logs) is NOT skipped — flow logs live in modules/observability.
+
+skip-check:
+  # Single-region by design (no S3 CRR).
+  - CKV_AWS_144
+  # KMS key policies use Resource "*" — required AWS key-policy pattern.
+  - CKV_AWS_109
+  - CKV_AWS_111
+
+download-external-modules: false

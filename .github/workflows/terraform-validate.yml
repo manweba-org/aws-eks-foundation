@@ -1,0 +1,73 @@
+name: Terraform Validate
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+env:
+  TF_VERSION: "1.9.8"
+
+jobs:
+  validate:
+    name: fmt / init / validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        # actions/checkout@v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Setup Terraform
+        # hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+
+      - name: Validate roots
+        run: |
+          set -euo pipefail
+          ROOTS=(
+            modules/networking
+            modules/security
+            modules/storage
+            modules/database
+            modules/eks
+            modules/alb
+            modules/observability
+            environments/dev
+            environments/staging
+            environments/prod
+            examples/full-stack
+          )
+          mkdir -p /tmp/tf-validate-logs
+          for dir in "${ROOTS[@]}"; do
+            echo "::group::Validate $dir"
+            status=0
+            (
+              cd "$dir"
+              terraform init -backend=false -input=false
+              terraform validate
+            ) 2>&1 | tee "/tmp/tf-validate-logs/$(echo "$dir" | tr '/' '_').log" || status=$?
+            echo "::endgroup::"
+            if [ "$status" -ne 0 ]; then
+              echo "Validation failed for $dir"
+              exit "$status"
+            fi
+          done
+
+      - name: Upload logs on failure
+        if: failure()
+        # actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: terraform-validate-logs
+          path: /tmp/tf-validate-logs/
+          if-no-files-found: ignore

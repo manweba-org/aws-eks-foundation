@@ -1,0 +1,8 @@
+# Example root tfvars (do not commit real secrets)
+
+project_name = "aidemo"
+environment  = "dev"
+owner        = "platform-team"
+cost_center  = "engineering-demo"
+primary_region = "us-east-1"
+vpc_cidr       = "10.0.0.0/16"

@@ -1,0 +1,122 @@
+name: Terraform Plan (manual)
+
+# Manual only — does NOT run on PR/push. Requires GitHub Environment protection
+# and OIDC federation to AWS. No long-lived access keys.
+#
+# Required GitHub Environment "aws-plan" variables (repository or environment):
+#   AWS_ROLE_ARN              — IAM role ARN trusted for GitHub OIDC
+#   AWS_REGION                — AWS region for the provider
+#   TF_STATE_BUCKET           — S3 state bucket name
+#   TF_STATE_KEY_PREFIX       — Key prefix; final key is ${prefix}/${environment}/terraform.tfstate
+#   TF_STATE_REGION           — Region of the state bucket (often same as AWS_REGION)
+#   TF_STATE_DYNAMODB_TABLE   — DynamoDB table for state locking
+#
+# IAM trust: token.actions.githubusercontent.com with sub conditions for this repo.
+# Enable required reviewers on the aws-plan environment for prod plans.
+#
+# After plan succeeds, Conftest evaluates terraform show -json (plan-time policy).
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment directory"
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  TF_VERSION: "1.9.8"
+  CONFTEST_VERSION: "0.55.0"
+  CONFTEST_SHA256: "1f2c78cdd2ad6bc4cbbdce5ca3e0d15fdc7d10303a629a56118614089c311385"
+
+jobs:
+  plan:
+    name: plan ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: aws-plan
+    defaults:
+      run:
+        working-directory: environments/${{ inputs.environment }}
+    steps:
+      - name: Checkout
+        # actions/checkout@v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Configure AWS credentials (OIDC)
+        # aws-actions/configure-aws-credentials@v4.1.0
+        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: github-terraform-plan
+
+      - name: Setup Terraform
+        # hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Generate backend.hcl from GitHub variables
+        env:
+          TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+          TF_STATE_KEY_PREFIX: ${{ vars.TF_STATE_KEY_PREFIX }}
+          TF_STATE_REGION: ${{ vars.TF_STATE_REGION }}
+          TF_STATE_DYNAMODB_TABLE: ${{ vars.TF_STATE_DYNAMODB_TABLE }}
+          TF_ENV: ${{ inputs.environment }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for v in TF_STATE_BUCKET TF_STATE_KEY_PREFIX TF_STATE_REGION TF_STATE_DYNAMODB_TABLE; do
+            if [ -z "${!v:-}" ]; then missing+=("$v"); fi
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "Missing required GitHub Environment variables: ${missing[*]}"
+            echo "Configure them on the aws-plan GitHub Environment."
+            exit 1
+          fi
+          cat > backend.hcl <<EOF
+          bucket         = "${TF_STATE_BUCKET}"
+          key            = "${TF_STATE_KEY_PREFIX}/${TF_ENV}/terraform.tfstate"
+          region         = "${TF_STATE_REGION}"
+          dynamodb_table = "${TF_STATE_DYNAMODB_TABLE}"
+          encrypt        = true
+          EOF
+          echo "Wrote backend.hcl (not uploaded as artifact)."
+
+      - name: Terraform init
+        run: terraform init -input=false -backend-config=backend.hcl
+
+      - name: Terraform plan
+        run: |
+          terraform plan -input=false -no-color -out=tfplan
+          terraform show -no-color tfplan | sed -n '1,200p'
+          terraform show -json tfplan > /tmp/tfplan.json
+
+      - name: Install Conftest (checksum verified)
+        working-directory: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          curl -fsSLo conftest.tgz \
+            "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz"
+          echo "${CONFTEST_SHA256}  conftest.tgz" | sha256sum -c -
+          tar -xzf conftest.tgz conftest
+          sudo mv conftest /usr/local/bin/conftest
+
+      - name: Conftest against plan JSON
+        working-directory: ${{ github.workspace }}
+        run: conftest test /tmp/tfplan.json --policy policies/conftest/plan/
+
+      - name: Cleanup plan and backend files
+        if: always()
+        run: rm -f tfplan backend.hcl /tmp/tfplan.json
+
+      # Intentionally NOT uploading state or plan artifacts (may contain secrets).

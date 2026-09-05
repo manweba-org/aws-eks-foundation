@@ -1,0 +1,43 @@
+project_name = "aidemo"
+environment  = "prod"
+owner        = "platform-team"
+cost_center  = "engineering-demo"
+data_classification = "confidential"
+
+primary_region = "us-east-1"
+vpc_cidr       = "10.2.0.0/16"
+az_count       = 3
+
+# HA / cost: per-AZ NAT
+single_nat_gateway      = false
+rds_multi_az            = true
+rds_deletion_protection = true
+backup_retention_days   = 35
+eks_desired_size        = 3
+eks_min_size            = 3
+eks_max_size            = 6
+eks_node_instance_types = ["m5.large"]
+rds_instance_class      = "db.m5.large"
+
+enable_encryption   = true
+enable_flow_logs    = true
+enable_backup       = true
+enable_cloudtrail   = true
+enable_guardduty    = true
+enable_config       = true
+# Security Hub is optional (in-account standards; org aggregation needs delegated admin).
+enable_security_hub = false
+
+enable_alb            = true
+enable_irsa           = true
+enable_addons         = true
+enable_access_entries = true
+# REQUIRED for kubectl: IAM principals with private-network path to the API
+# cluster_admin_principal_arns = ["arn:aws:iam::123456789012:role/ProdClusterAdmins"]
+# REQUIRED for HTTPS on the ALB in production:
+# alb_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/..."
+
+# REQUIRED before exposing any admin HTTPS paths: corporate egress CIDRs only.
+allowed_admin_cidrs = []
+
+compliance_frameworks = ["well-architected", "cis-aws", "nist-csf"]

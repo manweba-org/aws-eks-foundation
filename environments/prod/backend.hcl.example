@@ -1,0 +1,8 @@
+# Copy to backend.hcl and fill in. Bootstrap bucket/lock table separately.
+# Prefer a dedicated prod state bucket / lock table and GitHub Environment protection.
+
+bucket         = "REPLACE_ORG-tfstate"
+key            = "aws-infrastructure-demo/prod/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "REPLACE_ORG-tfstate-lock"
+encrypt        = true

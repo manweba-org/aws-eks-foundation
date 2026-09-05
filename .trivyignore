@@ -1,0 +1,14 @@
+# Trivy ignore entries — every exception needs a justification.
+# Prefer fixing findings over ignoring them.
+# IDs: https://avd.aquasec.com/misconfig/
+
+# Intentional internet-facing Application Load Balancer (public edge for the app).
+AVD-AWS-0053
+
+# HTTP :80 listener is required for ACM HTTP→HTTPS redirect (and HTTP-only demo when
+# certificate_arn is unset). HTTPS listener uses TLS 1.3 when a cert is provided.
+AVD-AWS-0054
+
+# EKS control-plane and node SGs must allow egress 0.0.0.0/0 so nodes can pull images
+# and call AWS APIs via NAT. Ingress remains least-privilege (no SSH from the world).
+AVD-AWS-0104

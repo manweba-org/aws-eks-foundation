@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/manweba-org/aws-eks-foundation/security/advisories/new
+    about: Report a security issue privately (do not open a public issue).
+  - name: Contributing guide
+    url: https://github.com/manweba-org/aws-eks-foundation/blob/main/CONTRIBUTING.md
+    about: How to set up locally, open PRs, and what CI expects.

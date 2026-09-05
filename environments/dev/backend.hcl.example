@@ -1,0 +1,8 @@
+# Copy to backend.hcl and fill in. Bootstrap bucket/lock table separately.
+# Never commit real backend.hcl with account-specific names if undesired.
+
+bucket         = "REPLACE_ORG-tfstate"
+key            = "aws-infrastructure-demo/dev/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "REPLACE_ORG-tfstate-lock"
+encrypt        = true

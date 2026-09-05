@@ -1,0 +1,7 @@
+# Copy to backend.hcl and fill in. Bootstrap bucket/lock table separately.
+
+bucket         = "REPLACE_ORG-tfstate"
+key            = "aws-infrastructure-demo/staging/terraform.tfstate"
+region         = "us-east-1"
+dynamodb_table = "REPLACE_ORG-tfstate-lock"
+encrypt        = true

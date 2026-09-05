@@ -1,0 +1,6 @@
+{
+  "resource_type": "aws_db_instance",
+  "name": "aidemo-dev-postgres",
+  "publicly_accessible": false,
+  "storage_encrypted": true
+}

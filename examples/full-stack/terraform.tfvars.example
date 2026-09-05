@@ -1,0 +1,29 @@
+project_name = "aidemo"
+environment  = "dev"
+owner        = "platform-team"
+cost_center  = "engineering-demo"
+
+primary_region = "us-east-1"
+vpc_cidr       = "10.0.0.0/16"
+az_count       = 2
+
+single_nat_gateway      = true
+rds_multi_az            = false
+rds_deletion_protection = false
+backup_retention_days   = 7
+
+enable_encryption  = true
+enable_flow_logs   = true
+enable_backup      = true
+enable_cloudtrail  = true
+enable_guardduty   = false
+enable_security_hub = false
+enable_config      = false
+
+enable_alb            = true
+enable_irsa           = true
+enable_addons         = true
+enable_access_entries = true
+
+allowed_admin_cidrs = []
+compliance_frameworks = ["well-architected", "cis-aws"]
